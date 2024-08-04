@@ -21,8 +21,11 @@ See [Clone SOP - hounotes](https://scrapbox.io/hounotes/Clone_SOP)
 
 Copy input geometry on circle. This tool inspired by MODO.
 
-### PolyFill Hybrid SOP
-![]()
+### PolyFill from Points SOP
+![](https://i.gyazo.com/610c87ddde41f57cd41181f8b800141f.gif)
+
+[PolyFill SOP](https://www.sidefx.com/docs/houdini/nodes/sop/polyfill.html) does not supports point selection, this node supports point selection in addition to edge selection.  
+This tool inspired by MODO.
 
 ### Snake Hook SOP
 ![]()
