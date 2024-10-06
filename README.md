@@ -28,5 +28,7 @@ Copy input geometry on circle. This tool inspired by MODO.
 This tool inspired by MODO.
 
 ### Snake Hook SOP
-![]()
+![](https://i.gyazo.com/9f719c796dbbbecd58233dfeff102352.gif)
 
+This tool extends the [Sweep SOP](https://www.sidefx.com/docs/houdini/nodes/sop/sweep.html) so that the Cross Section can also be adjusted from the Ramp.
+It used to create shapes such as nails and toon-look hair.
