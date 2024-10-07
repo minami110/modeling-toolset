@@ -118,7 +118,6 @@ class CloneState(object):
             return
 
         parm_name = parm_tuple.name()
-        print(parm_name)
 
         # mode が変更されたときは Hud を更新する
         if parm_name == CloneState.MODE_PARM:
