@@ -2,7 +2,7 @@
   "path": "$MODELING_TOOLSET",
   "load_package_once": true,
   "enable": "houdini_version >= '19.0'",
-  "version": "1.0",
+  "version": "1.0.1",
   "env": [
     {
       "MODELING_TOOLSET": "<ENTER_YOUR_INSTALL_PATH>/modeling-toolset"
