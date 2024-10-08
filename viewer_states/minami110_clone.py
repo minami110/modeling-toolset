@@ -1,8 +1,11 @@
+from typing import Optional
 import hou
 import viewerstate.utils as su
 
 
 class CloneState(object):
+
+    ICON = "opdef:/minami110::Sop/clone::2.0?clone.png"
 
     # Hotkeys and menus
     CONTEXT_MENU_NAME = "clone_menu"
@@ -19,19 +22,18 @@ class CloneState(object):
 
     MODE_NAMES = ["Jump", "Between"]
 
-    def __init__(self, state_name, scene_viewer):
+    def __init__(self, state_name: str, scene_viewer: hou.SceneViewer):
 
         self.state_name = state_name
         self.scene_viewer = scene_viewer
-        self.node = None
 
         category = hou.sopNodeTypeCategory()
         HK_CTXT = su.hotkeyContextForState(
             state_name, category
         )  # h.pane.gview.state.sop.minami110_clone
 
-        def hkSymbol(code):
-            return HK_CTXT + "." + code
+        def hkSymbol(code: str) -> str:
+            return f"{HK_CTXT}.{code}"
 
         hk_jump_mode = hkSymbol(CloneState.MENU_JUMPMODE_CODE)
         hk_between_mode = hkSymbol(CloneState.MENU_BETWEENMODE_CODE)
@@ -39,16 +41,18 @@ class CloneState(object):
         HUD_TEMPLATE = {
             "title": "Clone",
             "desc": "tool",
-            "icon": "opdef:/minami110::Sop/clone::2.0?clone.png",
+            "icon": CloneState.ICON,
             "rows": [
                 {
                     "id": "mode",
                     "label": "Mode",
-                    "key": "{}/{}".format(
-                        su.hudHotkeyRef(hk_jump_mode), su.hudHotkeyRef(hk_between_mode)
-                    ),
+                    "key": f"{su.hudHotkeyRef(hk_jump_mode)}/{su.hudHotkeyRef(hk_between_mode)}",
                 },
-                {"id": "mode_g", "type": "choicegraph", "count": 2},
+                {
+                    "id": "mode_g",
+                    "type": "choicegraph",
+                    "count": len(CloneState.MODE_NAMES),
+                },
                 {"id": "radius", "label": "Change count", "key": "mousewheel"},
             ],
         }
@@ -56,27 +60,19 @@ class CloneState(object):
         self.scene_viewer.hudInfo(template=HUD_TEMPLATE)
 
     def onEnter(self, kwargs):
-        self.node = kwargs["node"]
+        self.node: hou.SopNode = kwargs["node"]
         self.node.addEventCallback(
-            [hou.nodeEventType.ParmTupleChanged], self._nodeParmUpdated
+            [hou.nodeEventType.ParmTupleChanged], self._onNodeParmUpdated
         )
         self.node.addEventCallback(
-            [hou.nodeEventType.InputRewired], self._inputRewired
+            [hou.nodeEventType.InputRewired], self._onInputRewired
         )
         self.node.setOutputForViewFlag(-1)
         self._updateHud()
-
         self._updateHandleOrigin()
 
-        
-
     def onExit(self, kwargs):
-        self.node.removeEventCallback(
-            [hou.nodeEventType.ParmTupleChanged], self._nodeParmUpdated
-        )
-        self.node.removeEventCallback(
-            [hou.nodeEventType.InputRewired], self._inputRewired
-        )
+        self.node.removeAllEventCallbacks()
         self.node.setOutputForViewFlag(0)
 
     def onMouseWheelEvent(self, kwargs):
@@ -112,7 +108,7 @@ class CloneState(object):
         )
 
     # ノードのパラメータが更新されたときのコールバック
-    def _nodeParmUpdated(self, event_type, node, **kwargs):
+    def _onNodeParmUpdated(self, event_type, node, **kwargs):
         parm_tuple = kwargs.get("parm_tuple")
         if not parm_tuple:
             return
@@ -123,13 +119,17 @@ class CloneState(object):
         if parm_name == CloneState.MODE_PARM:
             self._updateHud()
 
-    def _inputRewired(self, event_type, node, **kwargs):
+    def _onInputRewired(self, event_type, node, **kwargs):
         self._updateHandleOrigin()
 
     def _updateHandleOrigin(self):
         # 入力Geometry にアクセスして, Bounding Box の Center を取得する
         # この値を Hidden している Handle 用のパラメーター origin に代入しておく
-        geo = self.node.inputGeometry(0)
+
+        if not self.node:
+            return
+
+        geo: Optional[hou.Geometry] = self.node.inputGeometry(0)
 
         if not geo:
             with hou.undos.disabler():
@@ -138,7 +138,7 @@ class CloneState(object):
                 self.node.parm("originz").set(0)
             return
 
-        bBox = geo.boundingBox()
+        bBox : hou.BoundingBox = geo.boundingBox()
         center = bBox.center()
         with hou.undos.disabler():
             self.node.parm("originx").set(center.x())
@@ -147,20 +147,17 @@ class CloneState(object):
 
 
 def createViewerStateTemplate():
-    """Mandatory entry point to create and return the viewer state
-    template to register."""
-
     state_typename = "minami110_clone"
     state_label = "Clone"
     state_category = hou.sopNodeTypeCategory()
-    state_icon = "opdef:/minami110::Sop/clone::2.0?clone.png"
+    state_icon = CloneState.ICON
 
     template = hou.ViewerStateTemplate(state_typename, state_label, state_category)
     template.bindFactory(CloneState)
     template.bindIcon(state_icon)
 
     # Begin Hotkey setup
-    hotkey_definitions: hou.PluginHotkeyDefinitions = hou.PluginHotkeyDefinitions()
+    hotkey_definitions = hou.PluginHotkeyDefinitions()
     menu = hou.ViewerStateMenu(CloneState.CONTEXT_MENU_NAME, "Clone Menu")
 
     def addHotkeyActionItem(code, desc, key):
