@@ -1,39 +1,36 @@
 import hou
-import viewerstate.utils as su
-
-HUD_TEMPLATE = {
-    "title": "Snake Hook",
-    "desc": "tool",
-    "icon": "opdef:/minami110::Sop/snake_hook::2.0?snake_fook.png",
-    "rows": [
-        {"id": "width", "label": "Cross Section Width", "key": "LMB"},
-        {"id": "height", "label": "Cross Section Height", "key": "Shift LMB"},
-        {"id": "roll", "label": "Roll", "key": "Ctrl LMB"},
-        {"id": "div", "label": "Cross Section Division", "key": "mousewheel"},
-    ],
-}
 
 
 class State(object):
     def __init__(self, state_name, scene_viewer):
         self.state_name = state_name
         self.scene_viewer = scene_viewer
+
+        HUD_TEMPLATE = {
+            "title": "Snake Hook",
+            "desc": "tool",
+            "icon": "opdef:/minami110::Sop/snake_hook::2.0?snake_fook.png",
+            "rows": [
+                {"id": "width", "label": "Cross Section Width", "key": "LMB"},
+                {"id": "height", "label": "Cross Section Height", "key": "Shift LMB"},
+                {"id": "roll", "label": "Roll", "key": "Ctrl LMB"},
+                {"id": "div", "label": "Cross Section Division", "key": "mousewheel"},
+            ],
+        }
+
         self.scene_viewer.hudInfo(template=HUD_TEMPLATE)
 
     def onEnter(self, kwargs):
-        node = kwargs["node"]
-        state_parms = kwargs["state_parms"]
-        node.setOutputForViewFlag(-1)  # Set view node in state
+        self.node: hou.SopNode = kwargs["node"]
+        self.node.setOutputForViewFlag(-1)  # Set view node in state
 
         # Store parameters
-        self._parm_cross_width = node.parm("generate_cross_width")
-        self._parm_cross_height = node.parm("crossHeightScale")
-        self._parm_roll = node.parm("sweep1_roll")
+        self._parm_cross_width = self.node.parm("generate_cross_width")
+        self._parm_cross_height = self.node.parm("crossHeightScale")
+        self._parm_roll = self.node.parm("sweep1_roll")
 
     def onExit(self, kwargs):
-        node = kwargs["node"]
-        state_parms = kwargs["state_parms"]
-        node.setOutputForViewFlag(0)  # Reset view node in state
+        self.node.setOutputForViewFlag(0)  # Reset view node in state
 
     def onMouseEvent(self, kwargs):
         ui_event: hou.ViewerEvent = kwargs["ui_event"]
@@ -89,7 +86,7 @@ class State(object):
                     max(self._start_value_lmbop + delta_x * self._drag_scale * 50, 0)
                 )
             elif self._lmb_mode == 2:
-                # Roll はカメラ距離に依存しない調整を行う5
+                # Roll はカメラ距離に依存しない調整を行う
                 self._parm_roll.set(self._start_value_lmbop + delta_x * 0.8)
 
     def onMouseWheelEvent(self, kwargs):
@@ -98,8 +95,7 @@ class State(object):
         scroll = device.mouseWheel()
 
         # Increment or decrement count parameter
-        node = kwargs["node"]
-        parm_count = node.parm("halfcrosscount")
+        parm_count = self.node.parm("halfcrosscount")
         currentcount = parm_count.eval()
         newcount = max(currentcount + scroll, 1)
         if newcount != currentcount:

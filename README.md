@@ -14,10 +14,9 @@
 ![](https://i.gyazo.com/0fbd0896f0c35089719f5a9db368d7e0.gif)
 
 Copy input geometry on line. This tool inspired by MODO.  
-See [Clone SOP - hounotes](https://scrapbox.io/hounotes/Clone_SOP)
 
 ### Radial Array SOP
-![]()
+![](https://i.gyazo.com/744c41f2fc0ef80e2431a95559c8353e.gif)
 
 Copy input geometry on circle. This tool inspired by MODO.
 
