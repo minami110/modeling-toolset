@@ -5,7 +5,7 @@ import viewerstate.utils as su
 
 class CloneState(object):
 
-    ICON = "opdef:/minami110::Sop/clone::2.0?clone.png"
+    ICON = "minami110_clone"
 
     # Hotkeys and menus
     CONTEXT_MENU_NAME = "clone_menu"
@@ -150,11 +150,10 @@ def createViewerStateTemplate():
     state_typename = "minami110_clone"
     state_label = "Clone"
     state_category = hou.sopNodeTypeCategory()
-    state_icon = CloneState.ICON
 
     template = hou.ViewerStateTemplate(state_typename, state_label, state_category)
     template.bindFactory(CloneState)
-    template.bindIcon(state_icon)
+    template.bindIcon(CloneState.ICON)
 
     # Begin Hotkey setup
     hotkey_definitions = hou.PluginHotkeyDefinitions()

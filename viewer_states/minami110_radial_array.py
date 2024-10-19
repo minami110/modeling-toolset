@@ -3,7 +3,7 @@ import hou
 
 class RadialArrayState(object):
 
-    ICON = "opdef:/minami110::Sop/radial_array::1.0?radarray.png"
+    ICON = "minami110_radial_array"
     BEGIN_ANGLE_PARM = "beginangle"
     END_ANGLE_PARM = "endangle"
     OFFSET_PARM = "offset"
@@ -112,10 +112,9 @@ def createViewerStateTemplate():
     state_typename = "minami110_radial_array"
     state_label = "Radial Array"
     state_category = hou.sopNodeTypeCategory()
-    state_icon = RadialArrayState.ICON
 
     template = hou.ViewerStateTemplate(state_typename, state_label, state_category)
     template.bindFactory(RadialArrayState)
-    template.bindIcon(state_icon)
+    template.bindIcon(RadialArrayState.ICON)
 
     return template

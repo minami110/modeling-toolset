@@ -2,6 +2,9 @@ import hou
 
 
 class State(object):
+
+    ICON = "minami110_snake_hook"
+
     def __init__(self, state_name, scene_viewer):
         self.state_name = state_name
         self.scene_viewer = scene_viewer
@@ -9,7 +12,7 @@ class State(object):
         HUD_TEMPLATE = {
             "title": "Snake Hook",
             "desc": "tool",
-            "icon": "opdef:/minami110::Sop/snake_hook::2.0?snake_fook.png",
+            "icon": State.ICON,
             "rows": [
                 {"id": "width", "label": "Cross Section Width", "key": "LMB"},
                 {"id": "height", "label": "Cross Section Height", "key": "Shift LMB"},
@@ -112,6 +115,6 @@ def createViewerStateTemplate():
 
     template = hou.ViewerStateTemplate(state_typename, state_label, state_cat)
     template.bindFactory(State)
-    template.bindIcon("opdef:/minami110::Sop/snake_hook::2.0?snake_fook.png")
+    template.bindIcon(State.ICON)
 
     return template
